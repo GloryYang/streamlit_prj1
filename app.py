@@ -5,12 +5,12 @@ import matplotlib.font_manager as fm
 import os
 
 # 尝试加载项目中的中文字体
-# font_path = os.path.join("fonts", "NotoSansSC-Regular.otf")
-font_path = os.path.join("fonts", "SimHei.ttf")
+font_path = os.path.join("fonts", "NotoSansSC-Regular.otf")
+# font_path = os.path.join("fonts", "SimHei.ttf")
 if os.path.exists(font_path):
     fm.fontManager.addfont(font_path)
-    # plt.rcParams['font.sans-serif'] = ['Noto Sans SC']
-    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.rcParams['font.sans-serif'] = ['Noto Sans SC']
+    # plt.rcParams['font.sans-serif'] = ['SimHei']
 else:
     # 如果没有找到字体，就用系统默认字体
     # plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
@@ -87,6 +87,7 @@ col1.metric("平均总销售额", f"{filtered_df['总销售额'].mean():.0f} 万
 col2.metric("平均利润", f"{filtered_df['利润'].mean():.0f} 万元")
 col3.metric("利润最高年份", int(filtered_df.loc[filtered_df['利润'].idxmax(), '年份']))
 col4.metric("总销售额增长率", f"{(filtered_df['总销售额'].iloc[-1] / filtered_df['总销售额'].iloc[0] - 1) * 100:.1f}%")
+
 
 
 
