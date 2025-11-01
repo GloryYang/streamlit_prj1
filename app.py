@@ -29,9 +29,9 @@ df = load_data()
 st.sidebar.header("控制面板")
 selected_years = st.sidebar.slider(
     "选择年份范围:",
-    min_value=2020,
+    min_value=2018,
     max_value=2023,
-    value=(2020, 2023)  # 默认值
+    value=(2018, 2023)  # 默认值
 )
 show_profit = st.sidebar.checkbox("显示利润", value=True)
 
