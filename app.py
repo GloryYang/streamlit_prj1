@@ -31,7 +31,7 @@ selected_years = st.sidebar.slider(
     "选择年份范围:",
     min_value=2020,
     max_value=2023,
-    value=(2018, 2023)  # 默认值
+    value=(2020, 2023)  # 默认值
 )
 show_profit = st.sidebar.checkbox("显示利润", value=True)
 
@@ -74,5 +74,6 @@ col1.metric("平均总销售额", f"{filtered_df['总销售额'].mean():.0f} 万
 col2.metric("平均利润", f"{filtered_df['利润'].mean():.0f} 万元")
 col3.metric("利润最高年份", int(filtered_df.loc[filtered_df['利润'].idxmax(), '年份']))
 col4.metric("总销售额增长率", f"{(filtered_df['总销售额'].iloc[-1] / filtered_df['总销售额'].iloc[0] - 1) * 100:.1f}%")
+
 
 
