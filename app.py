@@ -21,6 +21,7 @@ plt.rcParams['axes.unicode_minus'] = False
 # test file read on server
 df = pd.read_excel('t1.xlsx', sheet_name='ths_lr1',header=0, index_col=0)
 st.table(df.iloc[0:5, 0:5])
+df.iloc[0:5, 0:5].to_excel('t2.xlsx')
 
 # 设置页面
 st.set_page_config(page_title="销售数据分析看板", layout="wide")
@@ -91,6 +92,7 @@ col1.metric("平均总销售额", f"{filtered_df['总销售额'].mean():.0f} 万
 col2.metric("平均利润", f"{filtered_df['利润'].mean():.0f} 万元")
 col3.metric("利润最高年份", int(filtered_df.loc[filtered_df['利润'].idxmax(), '年份']))
 col4.metric("总销售额增长率", f"{(filtered_df['总销售额'].iloc[-1] / filtered_df['总销售额'].iloc[0] - 1) * 100:.1f}%")
+
 
 
 
