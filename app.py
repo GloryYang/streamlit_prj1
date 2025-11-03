@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
+from supabase import create_client
 
 # 尝试加载项目中的中文字体
 font_path = os.path.join("fonts", "NotoSansSC-Regular.otf")
@@ -15,21 +16,74 @@ else:
     # 如果没有找到字体，就用系统默认字体
     # plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
     pass
-    
 plt.rcParams['axes.unicode_minus'] = False
+
+# ====================================================================================
+# ======================
+# 初始化 Supabase 客户端
+# ======================
+@st.cache_resource
+def get_supabase():
+    url = st.secrets["supabase"]["url"]
+    key = st.secrets["supabase"]["key"]
+    return create_client(url, key)
+
+supabase = get_supabase()
+
+# ======================
+# 初始化 session_state
+# ======================
+if "watchlist" not in st.session_state:
+    # 从 Supabase 读取自选股
+    data = supabase.table("watchlist").select("*").order("id").execute().data
+    st.session_state.watchlist = [row["code"] for row in data]
+
+# ======================
+# 页面标题
+# ======================
+st.title("📈 自选股管理")
+
+# ======================
+# 添加股票
+# ======================
+new_stock = st.text_input("输入股票代码（如 sh600519）")
+
+if st.button("添加股票"):
+    if new_stock and new_stock not in st.session_state.watchlist:
+        # 写入 Supabase
+        try:
+            supabase.table("watchlist").insert({"code": new_stock}).execute()
+            # 更新 session_state
+            st.session_state.watchlist.append(new_stock)
+            st.success(f"✅ 已添加 {new_stock}")
+        except Exception as e:
+            st.error(f"❌ 添加失败: {e}")
+
+# ======================
+# 删除股票
+# ======================
+if st.session_state.watchlist:
+    delete_stock = st.selectbox("选择要删除的股票", [""] + st.session_state.watchlist)
+    if st.button("删除选中股票") and delete_stock:
+        try:
+            supabase.table("watchlist").delete().eq("code", delete_stock).execute()
+            st.session_state.watchlist.remove(delete_stock)
+            st.success(f"❌ 已删除 {delete_stock}")
+        except Exception as e:
+            st.error(f"❌ 删除失败: {e}")
+
+# ======================
+# 显示当前自选股
+# ======================
+st.subheader("🗂 当前自选股列表")
+st.table(pd.DataFrame(st.session_state.watchlist, columns=["股票代码"]))
+# ====================================================================================
+# ====================================================================================
+
 
 # test file read on server
 df = pd.read_excel('t1.xlsx', sheet_name='ths_lr1',header=0, index_col=0)
 st.table(df.iloc[0:5, 0:5])
-df.iloc[0:5, 0:5].to_excel('t2.xlsx', sheet_name='ths_lr1')
-# 获取当前工作目录
-cwd = os.getcwd()
-st.write("当前工作目录：", cwd)
-# 列出当前目录下所有文件和文件夹
-files = os.listdir(cwd)
-st.write("文件列表：", files)
-df1 = pd.read_excel('t2.xlsx', sheet_name='ths_lr1',header=0, index_col=0)
-st.table(df1)
 
 # 设置页面
 st.set_page_config(page_title="销售数据分析看板", layout="wide")
@@ -100,6 +154,7 @@ col1.metric("平均总销售额", f"{filtered_df['总销售额'].mean():.0f} 万
 col2.metric("平均利润", f"{filtered_df['利润'].mean():.0f} 万元")
 col3.metric("利润最高年份", int(filtered_df.loc[filtered_df['利润'].idxmax(), '年份']))
 col4.metric("总销售额增长率", f"{(filtered_df['总销售额'].iloc[-1] / filtered_df['总销售额'].iloc[0] - 1) * 100:.1f}%")
+
 
 
 
